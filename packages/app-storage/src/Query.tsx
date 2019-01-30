@@ -15,9 +15,8 @@ import { isU8a, u8aToHex, u8aToString } from '@polkadot/util';
 
 import translate from './translate';
 import { RenderFn, DefaultProps, ComponentRenderer } from '@polkadot/ui-api/with/types';
-import { thistle } from 'color-name';
 
-import "./Query.css";
+import './Query.css';
 
 type Props = I18nProps & {
   onRemove: (id: number) => void,
@@ -104,7 +103,7 @@ class Query extends React.PureComponent<Props, State> {
 
   render () {
     const { value } = this.props;
-    const { Component, inputs } = this.state;
+    const { Component } = this.state;
     const { key } = value;
 
     return (
@@ -115,7 +114,7 @@ class Query extends React.PureComponent<Props, State> {
           <Labelled
             label={
               <div>
-                {this.renderInputs()}  
+                {this.renderInputs()}
               </div>
             }
           >
@@ -136,49 +135,54 @@ class Query extends React.PureComponent<Props, State> {
     );
   }
 
-  private typeIsTuple (type: string) : boolean {
-    return type.charAt(0) === "(" && type.charAt(type.length-1) === ")"; 
+  private typeIsTuple (type: string): boolean {
+    return type.charAt(0) === '(' && type.charAt(type.length - 1) === ')';
   }
-  
-  private breakDownTuple (type: string) : Array<any> {
-    return type.substring(1,type.length-1).split(",");
+
+  private breakDownTuple (type: string): Array<any> {
+    return type.substring(1, type.length - 1).split(',');
   }
-  
-  private renderInputs() {
+
+  private renderInputs () {
     const value = this.props.value;
     const { key } = value;
 
-    //if function has inputs, render them
-    if( (value as StorageModuleQuery).params.length > 0 ){ 
-      const type = isU8a(key) ? 'Data' : key.meta.type.asMap.key.toString()
+    // if function has inputs, render them
+    if ((value as StorageModuleQuery).params.length > 0) {
+      const type = isU8a(key) ? 'Data' : key.meta.type.asMap.key.toString();
       const params = (value as StorageModuleQuery).params;
       return (
-        <div> 
+        <div>
           Inputs: ({type})
-          {params.map((obj)=>{
-              //check if the type name references a tuple, e.g. "(Hash, AccountId)"
-              if(this.typeIsTuple(type)) {
+          {
+            params.map((obj) => {
+              // check if the type name references a tuple, e.g. "(Hash, AccountId)"
+              if (this.typeIsTuple(type)) {
                 let types = this.breakDownTuple(type);
-                //if so run this function on each element of the tuple
+                // if so run valueToText on each element of the tuple
                 let output = [];
-                for(let i = 0; i < types.length; i++) {
-                  output[i] = <div className="query-input">
-                    {valueToText(types[i], (obj.value as Array<any>)[i])}
-                  </div>
+                for (let i = 0; i < types.length; i++) {
+                  output[i] = (
+                    <div className='query-input'>
+                      {valueToText(types[i], (obj.value as Array<any>)[i])}
+                    </div>
+                  );
                 }
                 return output;
               }
 
-            return <div className="query-input">
-            {valueToText(
-              type,
-              obj.value)}</div>;
-          })
-        }
+              return (
+                <div className='query-input'>
+                {
+                  valueToText(type,obj.value)
+                }
+                </div>
+              );
+            })
+          }
         </div>
-      )
-    }
-    else {
+      );
+    } else {
       return <div></div>;
     }
   }
