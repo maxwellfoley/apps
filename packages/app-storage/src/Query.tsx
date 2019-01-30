@@ -170,6 +170,7 @@ class Query extends React.PureComponent<Props, State> {
                 }
                 return output;
               }
+              console.log("resykt",valueToText(type,obj.value));
 
               return (
                 <div className='query-input'>
